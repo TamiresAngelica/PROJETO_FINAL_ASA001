@@ -1,0 +1,100 @@
+services:
+  dns:
+    build:
+      context: ./dns
+      dockerfile: Dockerfile
+    image: dns
+    container_name: dns
+    ports:
+      - "53:53/udp"
+      - "953/tcp"
+    networks:
+      - tamires
+
+  nginx:
+    build: 
+      context: ./nginx
+      dockerfile: Dockerfile
+    image: proxy
+    container_name: proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - web1
+      - web2
+    networks:
+      - tamires
+
+  web1:
+    image: wordpress
+    restart: always
+    container_name: web1
+    environment:
+      WORDPRESS_DB_HOST: db1
+      WORDPRESS_DB_USER: db_asa_user
+      WORDPRESS_DB_PASSWORD: db_asa_pass
+      WORDPRESS_DB_NAME: db_wordpress
+    networks:
+      - tamires
+    volumes:
+      - wordpress1:/var/www/html
+    depends_on:
+      - db1
+    
+  db1:
+    image: mysql:5.7
+    restart: always
+    container_name: db1
+    environment:
+      MYSQL_DATABASE: db_wordpress
+      MYSQL_USER: db_asa_user
+      MYSQL_PASSWORD: db_asa_pass
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    networks:
+      - tamires
+    volumes:
+      - db1:/var/lib/mysq
+  web2:
+    image: wordpress
+    restart: always
+    container_name: web2
+    environment:
+      WORDPRESS_DB_HOST: db2:3307
+      WORDPRESS_DB_USER: db_asa_user
+      WORDPRESS_DB_PASSWORD: db_asa_pass
+      WORDPRESS_DB_NAME: db_wordpress
+    networks:
+      - tamires
+    volumes:
+      - wordpress2:/var/www/html
+    depends_on:
+      - db2
+    
+  db2:
+    image: mysql:5.7
+    restart: always
+    container_name: db2
+    environment:
+      MYSQL_DATABASE: db_wordpress
+      MYSQL_USER: db_asa_user
+      MYSQL_PASSWORD: db_asa_pass
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+      MYSQL_TCP_PORT: 3307
+    networks:
+      - tamires
+    volumes:
+      - db2:/var/lib/mysq
+
+networks:
+  tamires:
+    driver: bridge
+
+volumes:
+  wordpress1:
+  db1:
+
+  wordpress2:
+  db2:
+
+  

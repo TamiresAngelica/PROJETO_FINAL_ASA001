@@ -1,0 +1,9 @@
+zone "ifrn.asa.br" {
+    type master;
+    file "/etc/bind/ifrn.asa.br";
+};
+
+zone "pf.ifrn.asa.br" {
+    type master;
+    file "/etc/bind/pf.ifrn.asa.br";
+};
