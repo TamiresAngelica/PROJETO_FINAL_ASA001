@@ -85,6 +85,17 @@ services:
       - tamires
     volumes:
       - db2:/var/lib/mysq
+  ssh:
+    build: 
+      context: ./ssh
+      dockerfile: Dockerfile
+    image: ssh
+    container_name: ssh
+    ports:
+      - '22:22'
+    privileged: true
+    networks:
+      - tamires
 
 networks:
   tamires:
